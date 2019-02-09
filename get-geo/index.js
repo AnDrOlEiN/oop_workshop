@@ -1,9 +1,9 @@
 import axios from 'axios';
 import Utils from '../utils';
 
-const ipAPI = url => axios.get(url);
+const makeRequest = url => axios.get(url);
 class GeoInfo {
-  constructor(sourceOfInfo = ipAPI) {
+  constructor(sourceOfInfo = makeRequest) {
     this.sourceOfInfo = sourceOfInfo;
   }
 
