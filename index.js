@@ -1,19 +1,20 @@
 #!/usr/bin/env node
 
-const program = require('commander');
-const Utils = require('./utils');
-const GeoInfo = require('./get-geo');
+import program from 'commander';
+import GeoInfo from './get-geo';
+
+import Utils from './utils';
 
 program
   .command('get-geo [ip]')
   .description('Simple utility for getting location by IP')
-  .action((ip) => {
+  .action(async (ip) => {
     if (ip) {
       ip.match(Utils.ipRegex)
-        ? new GeoInfo(ip).locate().then(result => console.log(result))
+        ? new GeoInfo(ip).getLocationByIP().then(result => console.log(result))
         : console.error('Argument should be a valid IP');
     } else {
-      console.log(new GeoInfo().locate().then(result => console.log(result)));
+      console.log(new GeoInfo().getLocationByIP().then(result => console.log(result)));
     }
   });
 

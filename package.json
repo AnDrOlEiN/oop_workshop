@@ -4,14 +4,19 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --recursive test",
-    "get-geo": "node index.js get-geo"
+    "test": "mocha --recursive --compilers js:@babel/register test",
+    "get-geo": "./node_modules/.bin/babel-node index.js get-geo"
   },
   "engines": {
     "node": ">=10.0.0"
   },
   "license": "ISC",
   "devDependencies": {
+    "@babel/cli": "^7.2.3",
+    "@babel/core": "^7.2.2",
+    "@babel/node": "^7.2.2",
+    "@babel/preset-env": "^7.3.1",
+    "@babel/register": "^7.0.0",
     "chai": "^4.2.0",
     "eslint": "^5.13.0",
     "eslint-config-airbnb-base": "^13.1.0",
@@ -20,6 +25,8 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
+    "axios-mock-adapter": "^1.16.0",
+    "chai-as-promised": "^7.1.1",
     "commander": "^2.19.0"
   }
 }
