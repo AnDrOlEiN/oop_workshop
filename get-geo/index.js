@@ -1,7 +1,7 @@
 import axios from 'axios';
 import Utils from '../utils';
 
-const ipAPI = (ip, url = Utils.geoServiceURL) => axios.get(`${url}${ip}`);
+const ipAPI = url => axios.get(url);
 class GeoInfo {
   constructor(sourceOfInfo = ipAPI) {
     this.sourceOfInfo = sourceOfInfo;
@@ -12,7 +12,7 @@ class GeoInfo {
     if (ip && !ip.match(Utils.ipRegex)) {
       throw new Error('Argument should be a valid IP');
     }
-    const response = await this.sourceOfInfo(ip);
+    const response = await this.sourceOfInfo(`${Utils.geoServiceURL}${ip}`);
     return response.data;
   }
 }

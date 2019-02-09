@@ -41,7 +41,8 @@ const dataForIp = {
   },
 };
 
-const localSource = (ip) => {
+const localSource = (url) => {
+  const ip = url.split('/')[4]; // really don't like it
   if (!ip) return dataWithoutIP;
   if (ip === '1.2.3.4') return dataForIp;
   return undefined;
