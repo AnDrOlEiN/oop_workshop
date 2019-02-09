@@ -2,6 +2,7 @@
 
 import program from 'commander';
 import GeoInfo from './get-geo';
+import Pipeline from './pipeline';
 
 program
   .command('get-geo [ip]')
@@ -15,6 +16,8 @@ program
       const result = await geoInfo.getLocationByIP();
       console.log(result);
     }
-  });
+  })
+  .command('pipeline')
+  .action(() => Pipeline());
 
 program.parse(process.argv);
