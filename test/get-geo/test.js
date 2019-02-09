@@ -56,12 +56,12 @@ describe('GeoInfo', () => {
 
   it('should work with valid arguments', async () => {
     mock.onGet('http://ip-api.com/json/1.2.3.4').reply(200, dataForIp);
-    const result = await new GeoInfo('1.2.3.4').getLocationByIP();
+    const result = await new GeoInfo().getLocationByIP('1.2.3.4');
     expect(result).to.deep.equal(dataForIp);
   });
 
   it('should not work with not valid arguments', () => {
-    const request = new GeoInfo('not valid').getLocationByIP();
+    const request = new GeoInfo().getLocationByIP('not valid');
     return expect(request).to.be.rejectedWith(Error);
   });
 });

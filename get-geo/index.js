@@ -1,16 +1,22 @@
 import axios from 'axios';
+import Utils from '../utils';
 
 class GeoInfo {
-  constructor(ip = '') {
-    this.ip = ip;
+  constructor(options = {}) {
+    this.options = options;
   }
 
-  async getLocationByIP() {
-    try {
-      const response = await axios.get(`http://ip-api.com/json/${this.ip}`);
-      return await response.data;
-    } catch (e) {
-      throw new Error('Unable to get ip info, please try again');
+  /* eslint-disable class-methods-use-this */
+  async getLocationByIP(ip = '') {
+    if (!ip || ip.match(Utils.ipRegex)) {
+      try {
+        const response = await axios.get(`http://ip-api.com/json/${ip}`);
+        return response.data;
+      } catch (e) {
+        throw new Error('Unable to get ip info, please try again');
+      }
+    } else {
+      throw new Error('Argument should be a valid IP');
     }
   }
 }

@@ -3,18 +3,17 @@
 import program from 'commander';
 import GeoInfo from './get-geo';
 
-import Utils from './utils';
-
 program
   .command('get-geo [ip]')
   .description('Simple utility for getting location by IP')
   .action(async (ip) => {
+    const geoInfo = new GeoInfo();
     if (ip) {
-      ip.match(Utils.ipRegex)
-        ? new GeoInfo(ip).getLocationByIP().then(result => console.log(result))
-        : console.error('Argument should be a valid IP');
+      const result = await geoInfo.getLocationByIP(ip);
+      console.log(result);
     } else {
-      console.log(new GeoInfo().getLocationByIP().then(result => console.log(result)));
+      const result = await geoInfo.getLocationByIP();
+      console.log(result);
     }
   });
 
