@@ -13,6 +13,9 @@ chai.use(chaiAsPromised);
 
 describe('GeoInfo', () => {
   const mock = new MockAdapter(axios);
+  beforeEach(() => {
+    mock.reset();
+  });
   const dataForIp = {
     as: '',
     city: 'South Brisbane',
