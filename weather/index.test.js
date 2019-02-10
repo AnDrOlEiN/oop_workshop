@@ -1,7 +1,7 @@
 /* eslint-env node, jest */
 
 import WeatherCollector, { DarkSkyService, OWMService, GeocodingService } from '.';
-import Utils from '../utils';
+import GlobalConstants from '../globalConstants';
 
 const weatherForBerlin = { weather: 'cloudy' };
 const weatherForMinsk = { weather: 'sunny' };
@@ -9,20 +9,20 @@ const coordinatesForBerlin = { lat: 1, lon: 2 };
 const coordinatesForMinsk = { lat: 3, lon: 4 };
 
 const fakeHttpClient = (url, options) => {
-  if (url.match(Utils.geocodingServiceURL) && options.params.q === 'minsk') {
+  if (url.match(GlobalConstants.geocodingServiceURL) && options.params.q === 'minsk') {
     return { data: [coordinatesForMinsk] };
   }
-  if (url.match(Utils.geocodingServiceURL) && options.params.q === 'berlin') {
+  if (url.match(GlobalConstants.geocodingServiceURL) && options.params.q === 'berlin') {
     return { data: [coordinatesForBerlin] };
   }
   if (
-    url.match(Utils.darkSkyURL)
+    url.match(GlobalConstants.darkSkyURL)
     && url.match(`${coordinatesForBerlin.lat},${coordinatesForBerlin.lon}`)
   ) {
     return { data: weatherForBerlin };
   }
   if (
-    url.match(Utils.OWMURL)
+    url.match(GlobalConstants.OWMURL)
     && url.match(`lat=${coordinatesForMinsk.lat}`)
     && url.match(`lon=${coordinatesForMinsk.lon}`)
   ) {

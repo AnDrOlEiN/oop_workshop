@@ -3,6 +3,7 @@
   "extends": "airbnb-base",
   "rules": {
     "no-console": "off",
+    "no-void": "off",
     "babel/semi": 0,
     "no-unused-expressions": "warn",
     "linebreak-style": 0

@@ -1,28 +1,28 @@
 import axios from 'axios';
-import Utils from '../utils';
 
 const defaultHTTPClient = (url, options) => axios.get(url, options);
 export class GeocodingService {
-  constructor(httpClient = defaultHTTPClient) {
+  constructor(httpClient = defaultHTTPClient, apiKey) {
+    this.apiKey = apiKey;
     this.httpClient = httpClient;
   }
 
-  locate = city => this.httpClient(Utils.geocodingServiceURL, {
+  locate = city => this.httpClient('https://eu1.locationiq.com/v1/search.php', {
     params: {
-      key: Utils.geocodingServiceToken,
+      key: this.apiKey,
       q: city,
       format: 'json',
     },
   });
 }
-const defaultGeocodingService = new GeocodingService().locate;
+const defaultGeocodingService = new GeocodingService();
 
 export class DarkSkyService {
-  constructor(httpClient = defaultHTTPClient, locator = defaultGeocodingService) {
+  constructor(httpClient = defaultHTTPClient, locator = defaultGeocodingService.locate, apiKey) {
     this.httpClient = httpClient;
     this.locator = locator;
-    this.url = Utils.darkSkyURL;
-    this.apiKey = Utils.darkSkyKey;
+    this.apiKey = apiKey;
+    this.url = 'https://api.darksky.net/forecast/';
   }
 
   async getCityCoordinates(city) {
@@ -40,11 +40,11 @@ export class DarkSkyService {
 }
 
 export class OWMService {
-  constructor(httpClient = defaultHTTPClient, locator = defaultGeocodingService) {
+  constructor(httpClient = defaultHTTPClient, locator = defaultGeocodingService.locate, apiKey) {
     this.httpClient = httpClient;
     this.locator = locator;
-    this.url = Utils.OWMURL;
-    this.apiKey = Utils.OWMKey;
+    this.apiKey = apiKey;
+    this.url = 'http://api.openweathermap.org/data/2.5/weather';
   }
 
   async getCityCoordinates(city) {
