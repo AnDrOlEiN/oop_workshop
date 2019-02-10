@@ -1,10 +1,17 @@
 import axios from 'axios';
 
 const defaultHTTPClient = (url, options) => axios.get(url, options);
-export class GeocodingService {
+
+class Service {
   constructor(httpClient = defaultHTTPClient, apiKey) {
     this.apiKey = apiKey;
     this.httpClient = httpClient;
+  }
+}
+
+export class GeocodingService extends Service {
+  constructor(httpClient = defaultHTTPClient, apiKey) {
+    super(httpClient, apiKey);
   }
 
   locate = city => this.httpClient('https://eu1.locationiq.com/v1/search.php', {
@@ -17,18 +24,23 @@ export class GeocodingService {
 }
 const defaultGeocodingService = new GeocodingService();
 
-export class DarkSkyService {
-  constructor(httpClient = defaultHTTPClient, locator = defaultGeocodingService.locate, apiKey) {
-    this.httpClient = httpClient;
+class WeatherService extends Service {
+  constructor(httpClient = defaultHTTPClient, apiKey, locator = defaultGeocodingService) {
+    super(httpClient, apiKey);
     this.locator = locator;
-    this.apiKey = apiKey;
-    this.url = 'https://api.darksky.net/forecast/';
   }
 
   async getCityCoordinates(city) {
     const result = await this.locator(city);
     const parsedResult = result.data[0];
     return parsedResult;
+  }
+}
+
+export class DarkSkyService extends WeatherService {
+  constructor(httpClient = defaultHTTPClient, locator = defaultGeocodingService, apiKey) {
+    super(httpClient, apiKey, locator);
+    this.url = 'https://api.darksky.net/forecast/';
   }
 
   async getWeather(city) {
@@ -39,18 +51,10 @@ export class DarkSkyService {
   }
 }
 
-export class OWMService {
-  constructor(httpClient = defaultHTTPClient, locator = defaultGeocodingService.locate, apiKey) {
-    this.httpClient = httpClient;
-    this.locator = locator;
-    this.apiKey = apiKey;
+export class OWMService extends WeatherService {
+  constructor(httpClient = defaultHTTPClient, locator = defaultGeocodingService, apiKey) {
+    super(httpClient, apiKey, locator);
     this.url = 'http://api.openweathermap.org/data/2.5/weather';
-  }
-
-  async getCityCoordinates(city) {
-    const result = await this.locator(city);
-    const parsedResult = result.data[0];
-    return parsedResult;
   }
 
   async getWeather(city) {
