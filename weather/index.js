@@ -1,57 +1,73 @@
 import axios from 'axios';
 import Utils from '../utils';
 
+const defaultHTTPClient = (url, options) => axios.get(url, options);
+
+class GeocodingService {
+  constructor(httpClient = defaultHTTPClient) {
+    this.httpClient = httpClient;
+  }
+
+  locate = city => this.httpClient(Utils.geocodingServiceURL, {
+    params: {
+      key: Utils.geocodingServiceToken,
+      q: city,
+      format: 'json',
+    },
+  });
+}
 export class DarkSkyService {
-  constructor() {
+  constructor(httpClient = defaultHTTPClient, locator = new GeocodingService().locate) {
+    this.httpClient = httpClient;
+    this.locator = locator;
     this.url = Utils.darkSkyURL;
     this.apiKey = Utils.darkSkyKey;
   }
 
-  getWeather(lat, lon) {
+  async getCityCoordinates(city) {
+    const result = await this.locator(city);
+    const parsedResult = result.data[0];
+    return parsedResult;
+  }
+
+  async getWeather(city) {
+    const { lat, lon } = await this.getCityCoordinates(city);
     const finalURL = `${this.url}${this.apiKey}/${lat},${lon}`;
     return axios.get(finalURL);
   }
 }
 
 export class OWMService {
-  constructor() {
+  constructor(httpClient = defaultHTTPClient, locator = new GeocodingService().locate) {
+    this.httpClient = httpClient;
+    this.locator = locator;
     this.url = Utils.OWMURL;
     this.apiKey = Utils.OWMKey;
   }
 
-  getWeather(lat, lon) {
+  async getCityCoordinates(city) {
+    const result = await this.locator(city);
+    const parsedResult = result.data[0];
+    return parsedResult;
+  }
+
+  async getWeather(city) {
+    const { lat, lon } = await this.getCityCoordinates(city);
     const finalURL = `${this.url}?lat=${lat}&lon=${lon}&APPID=${this.apiKey}`;
-    console.log(finalURL);
-    return axios.get(finalURL);
+    return this.httpClient(finalURL);
   }
 }
 
-const defaultLocate = city => axios.get(Utils.geocodingServiceURL, {
-  params: {
-    key: Utils.geocodingServiceToken,
-    q: city,
-    format: 'json',
-  },
-});
-
 export default class WeatherCollector {
-  constructor(service, locator = defaultLocate) {
+  constructor(service) {
     this.service = service;
-    this.locator = locator;
-  }
-
-  /* eslint-disable class-methods-use-this */
-  getCityCoordinates(city) {
-    return this.locator(city);
   }
 
   async collectWeather(city) {
-    const result = await this.getCityCoordinates(city);
-    if (!result || result.length === 0) {
+    const finalResult = await this.service.getWeather(city);
+    if (!finalResult) {
       throw Error('There is no such city');
     }
-    const { lat, lon } = result.data[0];
-    const finalResult = await this.service.getWeather(lat, lon);
     return finalResult.data;
   }
 }
