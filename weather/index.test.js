@@ -1,36 +1,50 @@
 /* eslint-env node, jest */
 
-import WeatherCollector from '.';
+import WeatherCollector, { DarkSkyService, OWMService, GeocodingService } from '.';
+import Utils from '../utils';
 
-const weatherForBerlin = {};
-const weatherForMinsk = {};
+const weatherForBerlin = { weather: 'cloudy' };
+const weatherForMinsk = { weather: 'sunny' };
+const coordinatesForBerlin = { lat: 1, lon: 2 };
+const coordinatesForMinsk = { lat: 3, lon: 4 };
 
-class StubService {
-  getWeather(city) {
-    if (city === 'berlin') this.result = { data: weatherForBerlin };
-    else if (city === 'minsk') this.result = { data: weatherForMinsk };
-    return this.result;
+const fakeHttpClient = (url, options) => {
+  if (url.match(Utils.geocodingServiceURL) && options.params.q === 'minsk') {
+    return { data: [coordinatesForMinsk] };
   }
-}
+  if (url.match(Utils.geocodingServiceURL) && options.params.q === 'berlin') {
+    return { data: [coordinatesForBerlin] };
+  }
+  if (
+    url.match(Utils.darkSkyURL)
+    && url.match(`${coordinatesForBerlin.lat},${coordinatesForBerlin.lon}`)
+  ) {
+    return { data: weatherForBerlin };
+  }
+  if (
+    url.match(Utils.OWMURL)
+    && url.match(`lat=${coordinatesForMinsk.lat}`)
+    && url.match(`lon=${coordinatesForMinsk.lon}`)
+  ) {
+    return { data: weatherForMinsk };
+  }
+  return null;
+};
+
+const geocodingService = new GeocodingService(fakeHttpClient).locate;
 
 describe('Weather', () => {
-  it('should work for Berlin', async () => {
-    const stubService = new StubService('berlin');
-    const weather = new WeatherCollector(stubService);
+  it('should work for Berlin using DarkSky', async () => {
+    const darkSky = new DarkSkyService(fakeHttpClient, geocodingService);
+    const weather = new WeatherCollector(darkSky);
     const result = await weather.collectWeather('berlin');
     expect(result).toEqual(weatherForBerlin);
   });
 
-  it('should work for Minsk', async () => {
-    const stubService = new StubService('minsk');
-    const weather = new WeatherCollector(stubService);
+  it('should work for Minsk using OMW', async () => {
+    const omw = new OWMService(fakeHttpClient, geocodingService);
+    const weather = new WeatherCollector(omw);
     const result = await weather.collectWeather('minsk');
     expect(result).toEqual(weatherForMinsk);
-  });
-
-  it('should not work without city', async () => {
-    const stubService = new StubService('');
-    const weather = new WeatherCollector(stubService);
-    expect(weather.collectWeather('')).rejects.toThrow(Error('There is no such city'));
   });
 });

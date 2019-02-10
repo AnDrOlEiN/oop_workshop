@@ -2,8 +2,7 @@ import axios from 'axios';
 import Utils from '../utils';
 
 const defaultHTTPClient = (url, options) => axios.get(url, options);
-
-class GeocodingService {
+export class GeocodingService {
   constructor(httpClient = defaultHTTPClient) {
     this.httpClient = httpClient;
   }
@@ -16,8 +15,10 @@ class GeocodingService {
     },
   });
 }
+const defaultGeocodingService = new GeocodingService().locate;
+
 export class DarkSkyService {
-  constructor(httpClient = defaultHTTPClient, locator = new GeocodingService().locate) {
+  constructor(httpClient = defaultHTTPClient, locator = defaultGeocodingService) {
     this.httpClient = httpClient;
     this.locator = locator;
     this.url = Utils.darkSkyURL;
@@ -33,12 +34,13 @@ export class DarkSkyService {
   async getWeather(city) {
     const { lat, lon } = await this.getCityCoordinates(city);
     const finalURL = `${this.url}${this.apiKey}/${lat},${lon}`;
-    return axios.get(finalURL);
+    const result = await this.httpClient(finalURL);
+    return result.data;
   }
 }
 
 export class OWMService {
-  constructor(httpClient = defaultHTTPClient, locator = new GeocodingService().locate) {
+  constructor(httpClient = defaultHTTPClient, locator = defaultGeocodingService) {
     this.httpClient = httpClient;
     this.locator = locator;
     this.url = Utils.OWMURL;
@@ -54,7 +56,8 @@ export class OWMService {
   async getWeather(city) {
     const { lat, lon } = await this.getCityCoordinates(city);
     const finalURL = `${this.url}?lat=${lat}&lon=${lon}&APPID=${this.apiKey}`;
-    return this.httpClient(finalURL);
+    const result = await this.httpClient(finalURL);
+    return result.data;
   }
 }
 
@@ -68,6 +71,6 @@ export default class WeatherCollector {
     if (!finalResult) {
       throw Error('There is no such city');
     }
-    return finalResult.data;
+    return finalResult;
   }
 }
