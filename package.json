@@ -6,7 +6,8 @@
   "scripts": {
     "test": "jest",
     "get-geo": "./node_modules/.bin/babel-node getGeoCli.js get-geo",
-    "pipeline": "./node_modules/.bin/babel-node pipelineCli.js pipeline"
+    "pipeline": "./node_modules/.bin/babel-node pipelineCli.js pipeline",
+    "weather": "./node_modules/.bin/babel-node weatherCli.js"
   },
   "engines": {
     "node": ">=10.0.0"
@@ -25,7 +26,6 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
-    "axios-mock-adapter": "^1.16.0",
     "chai-as-promised": "^7.1.1",
     "commander": "^2.19.0"
   }

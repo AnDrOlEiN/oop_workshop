@@ -1,7 +1,5 @@
 /* eslint-env node, jest */
 
-import axios from 'axios';
-import MockAdapter from 'axios-mock-adapter';
 import GeoInfo from '.';
 
 const dataWithoutIP = {
@@ -45,22 +43,17 @@ const localSource = (url) => {
   const ip = url.split('/')[4]; // really don't like it
   if (!ip) return dataWithoutIP;
   if (ip === '1.2.3.4') return dataForIp;
-  return undefined;
+  return null;
 };
 
 describe('GeoInfo', () => {
-  const mock = new MockAdapter(axios);
   const geoInfo = new GeoInfo(localSource);
-  beforeEach(() => {
-    mock.reset();
-  });
   it('should work without arguments', async () => {
     const result = await geoInfo.getLocationByIP();
     expect(result).toEqual(dataWithoutIP.data);
   });
 
   it('should work with valid arguments', async () => {
-    mock.onGet('http://ip-api.com/json/1.2.3.4').reply(200, dataForIp);
     const result = await geoInfo.getLocationByIP('1.2.3.4');
     expect(result).toEqual(dataForIp.data);
   });
